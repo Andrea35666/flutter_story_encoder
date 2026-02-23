@@ -1,3 +1,9 @@
+## 1.1.3
+
+- **Android Hotfix**: Fixed unresolved `program` and `textureId` references in `OpenGLRenderer.kt`.
+- **Android Gradle Hotfix**: Added `settings.gradle` to give the plugin's Android project a unique name, resolving IDE project collisions.
+- **Unit Tests**: Corrected Pigeon mock implementation and fixed missing imports in `flutter_story_encoder_test.dart`.
+
 ## 1.1.2
 
 - **iOS Hotfix**: Fixed color channel swap (Blue/Red) when encoding from Flutter raw RGBA frames.

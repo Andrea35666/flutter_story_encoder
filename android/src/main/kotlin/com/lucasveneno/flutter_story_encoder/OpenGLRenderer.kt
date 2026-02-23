@@ -13,6 +13,8 @@ class OpenGLRenderer(
     private var eglDisplay = EGL14.EGL_NO_DISPLAY
     private var eglContext = EGL14.EGL_NO_CONTEXT
     private var eglSurface = EGL14.EGL_NO_SURFACE
+    private var program: Int = 0
+    private var textureId: Int = 0
 
     private var rgbaBuffer: ByteBuffer? = null
     private val rectBuffer: ByteBuffer =

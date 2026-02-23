@@ -9,35 +9,3 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_story_encoder/src/pigeon.g.dart';
-
-
-class _PigeonCodec extends StandardMessageCodec {
-  const _PigeonCodec();
-  @override
-  void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is int) {
-      buffer.putUint8(4);
-      buffer.putInt64(value);
-    }    else if (value is EncoderConfig) {
-      buffer.putUint8(129);
-      writeValue(buffer, value.encode());
-    }    else if (value is EncodingStats) {
-      buffer.putUint8(130);
-      writeValue(buffer, value.encode());
-    } else {
-      super.writeValue(buffer, value);
-    }
-  }
-
-  @override
-  Object? readValueOfType(int type, ReadBuffer buffer) {
-    switch (type) {
-      case 129: 
-        return EncoderConfig.decode(readValue(buffer)!);
-      case 130: 
-        return EncodingStats.decode(readValue(buffer)!);
-      default:
-        return super.readValueOfType(type, buffer);
-    }
-  }
-}
