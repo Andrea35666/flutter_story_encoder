@@ -5,10 +5,12 @@ import AVFoundation
 public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHostApi {
     private var assetWriter: AVAssetWriter?
     private var videoInput: AVAssetWriterInput?
+    private var audioInput: AVAssetWriterInput?
     private var pixelBufferAdaptor: AVAssetWriterInputPixelBufferAdaptor?
     private var pixelBufferPool: CVPixelBufferPool?
     
     private var frameTime: CMTime = .zero
+    private var audioTime: CMTime = .zero
     private var isEncoding = false
     private let queue = DispatchQueue(label: "com.lucasveneno.flutter_story_encoder.queue")
     
@@ -32,6 +34,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         self.config = config
         self.framesProcessed = 0
         self.frameTime = .zero
+        self.audioTime = .zero
         
         let url = URL(fileURLWithPath: config.outputPath)
         try? FileManager.default.removeItem(at: url)
@@ -54,6 +57,17 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
             videoInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
             videoInput?.expectsMediaDataInRealTime = false
             
+            if config.addSilentAudio {
+                let audioSettings: [String: Any] = [
+                    AVFormatIDKey: kAudioFormatMPEG4AAC,
+                    AVNumberOfChannelsKey: 2,
+                    AVSampleRateKey: 44100.0,
+                    AVEncoderBitRateKey: 128000
+                ]
+                audioInput = AVAssetWriterInput(mediaType: .audio, outputSettings: audioSettings)
+                audioInput?.expectsMediaDataInRealTime = false
+            }
+            
             let attributes: [String: Any] = [
                 kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
                 kCVPixelBufferWidthKey as String: config.width,
@@ -68,6 +82,10 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
             
             if assetWriter!.canAdd(videoInput!) {
                 assetWriter!.add(videoInput!)
+            }
+            
+            if let audioInput = audioInput, assetWriter!.canAdd(audioInput) {
+                assetWriter!.add(audioInput)
             }
             
             if assetWriter!.startWriting() {
@@ -139,6 +157,11 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
             let fps = config?.fps ?? 30
             frameTime = CMTimeAdd(frameTime, CMTime(value: 1, timescale: Int32(fps)))
             
+            // Append silent audio to stay in sync if requested
+            if let audioInput = audioInput, audioInput.isReadyForMoreMediaData {
+                self.appendSilentAudio(until: self.frameTime)
+            }
+            
             let stats = EncodingStats(framesProcessed: framesProcessed, currentFps: Double(fps), progress: 0.0)
             DispatchQueue.main.async {
                 self.flutterApi?.onProgress(stats: stats) { _ in }
@@ -146,6 +169,61 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
             completion(.success(true))
         } else {
             completion(.failure(FlutterError(code: "APPEND_FAILED", message: assetWriter?.error?.localizedDescription ?? "Unknown", details: nil)))
+        }
+    }
+    
+    
+    private func appendSilentAudio(until pts: CMTime) {
+        guard let audioInput = audioInput else { return }
+        
+        while audioTime < pts && audioInput.isReadyForMoreMediaData {
+            let samplesCount = 1024
+            let duration = CMTime(value: CMTimeValue(samplesCount), timescale: 44100)
+            
+            // Create a silent audio buffer
+            var blockBuffer: CMBlockBuffer?
+            CMBlockBufferCreateWithMemoryBlock(
+                allocator: kCFAllocatorDefault,
+                memoryBlock: nil,
+                blockLength: samplesCount * 2 * 2, // 2 channels, 16-bit
+                blockAllocator: nil,
+                customBlockSource: nil,
+                offsetToData: 0,
+                dataLength: samplesCount * 2 * 2,
+                flags: 0,
+                blockBufferOut: &blockBuffer
+            )
+            
+            var sampleBuffer: CMSampleBuffer?
+            var formatDesc: CMAudioFormatDescription?
+            var asbd = AudioStreamBasicDescription(
+                mSampleRate: 44100.0,
+                mFormatID: kAudioFormatLinearPCM,
+                mFormatFlags: kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked,
+                mBytesPerPacket: 4,
+                mFramesPerPacket: 1,
+                mBytesPerFrame: 4,
+                mChannelsPerFrame: 2,
+                mBitsPerChannel: 16,
+                mReserved: 0
+            )
+            CMAudioFormatDescriptionCreate(allocator: kCFAllocatorDefault, asbd: &asbd, layoutSize: 0, layout: nil, magicCookieSize: 0, magicCookie: nil, extensions: nil, formatDescriptionOut: &formatDesc)
+            
+            CMSampleBufferCreateReady(
+                allocator: kCFAllocatorDefault,
+                dataBuffer: blockBuffer,
+                formatDescription: formatDesc,
+                numSamples: samplesCount,
+                sampleCount: 1,
+                sampleTimingArray: nil,
+                sampleSizeArray: nil,
+                sampleBufferOut: &sampleBuffer
+            )
+            
+            if let sampleBuffer = sampleBuffer {
+                audioInput.append(sampleBuffer)
+                audioTime = CMTimeAdd(audioTime, duration)
+            }
         }
     }
     

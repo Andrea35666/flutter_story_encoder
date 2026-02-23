@@ -1,4 +1,11 @@
-## 1.0.4
+## 1.1.0
+
+- **Commercial Grade Release**: Refactored both platforms for hardware-accelerated production use.
+- **Audio Support**: Added silent AAC audio track generation on iOS (AVFoundation) and Android (MediaCodec).
+- **iOS (AVFoundation)**: Implemented `CVPixelBufferPool` and `requestMediaDataWhenReady` for zero-allocation, thermal-stable encoding.
+- **Android (MediaCodec)**: Switched to Surface-based input with EGL/OpenGL ES for GPU-backed encoding.
+- **Improved API**: Migrated to Pigeon for type-safe, high-throughput IPC.
+- **Unified Telemetry**: Real-time stats (FPS, frames processed) streamed back to Flutter.
 
 - Fixed Android `@UiThread` exception by ensuring progress updates and completion callbacks run on the main thread.
 

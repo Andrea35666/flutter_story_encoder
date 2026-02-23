@@ -1,6 +1,6 @@
 name: flutter_story_encoder
 description: Production-grade, hardware-accelerated video export engine for social media stories on iOS (AVFoundation) and Android (MediaCodec).
-version: 1.0.4
+version: 1.1.0
 homepage: https://github.com/lucasveneno/flutter_story_encoder
 repository: https://github.com/lucasveneno/flutter_story_encoder
 issue_tracker: https://github.com/lucasveneno/flutter_story_encoder/issues
@@ -18,6 +18,8 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   pigeon: ^22.7.2
+  build_runner: ^2.7.1
+  mockito: ^5.5.0
 
 flutter:
   plugin:

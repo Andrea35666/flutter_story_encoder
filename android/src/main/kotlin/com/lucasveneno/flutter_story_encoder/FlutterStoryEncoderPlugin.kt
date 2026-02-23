@@ -13,15 +13,18 @@ import java.util.concurrent.Executors
 
 class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
     private var mediaCodec: MediaCodec? = null
+    private var audioCodec: MediaCodec? = null
     private var mediaMuxer: MediaMuxer? = null
     private var inputSurface: Surface? = null
     private var videoTrackIndex = -1
+    private var audioTrackIndex = -1
     private var isEncoding = false
     private val executor = Executors.newSingleThreadExecutor()
 
     private var flutterApi: StoryEncoderFlutterApi? = null
     private var config: EncoderConfig? = null
-    private var framesProcessed: Long = 0
+    private var videoFramesProcessed: Long = 0
+    private var audioBytesGenerated: Long = 0
 
     private var renderer: OpenGLRenderer? = null
 
@@ -39,7 +42,8 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
         executor.execute {
             try {
                 this.config = config
-                this.framesProcessed = 0
+                this.videoFramesProcessed = 0
+                this.audioBytesGenerated = 0
 
                 val format =
                         MediaFormat.createVideoFormat(
@@ -67,6 +71,19 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
                 mediaCodec?.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
                 inputSurface = mediaCodec?.createInputSurface()
                 mediaCodec?.start()
+
+                if (config.addSilentAudio) {
+                    val audioFormat =
+                            MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, 44100, 2)
+                    audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, 128000)
+                    audioFormat.setInteger(
+                            MediaFormat.KEY_AAC_PROFILE,
+                            MediaCodecInfo.CodecProfileLevel.AACObjectLC
+                    )
+                    audioCodec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC)
+                    audioCodec?.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                    audioCodec?.start()
+                }
 
                 renderer =
                         OpenGLRenderer(inputSurface!!, config.width.toInt(), config.height.toInt())
@@ -96,11 +113,17 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
                 drainEncoder(false)
 
                 // Deterministic PTS calculation (in nanoseconds for EGL)
-                val ptsNs = framesProcessed * 1000000000L / (config?.fps ?: 30)
+                val ptsNs = videoFramesProcessed * 1000000000L / (config?.fps ?: 30)
                 renderer?.render(rgbaData, ptsNs)
 
-                framesProcessed++
-                val stats = EncodingStats(framesProcessed, config?.fps?.toDouble() ?: 30.0, 0.0)
+                videoFramesProcessed++
+
+                if (config?.addSilentAudio == true) {
+                    feedSilentAudio(ptsNs)
+                }
+
+                val stats =
+                        EncodingStats(videoFramesProcessed, config?.fps?.toDouble() ?: 30.0, 0.0)
                 mainHandler.post {
                     flutterApi?.onProgress(stats) {}
                     callback(Result.success(true))
@@ -114,31 +137,65 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
     private fun drainEncoder(endOfStream: Boolean) {
         if (endOfStream) {
             mediaCodec?.signalEndOfInputStream()
+            audioCodec?.let {
+                val inputIndex = it.dequeueInputBuffer(5000)
+                if (inputIndex >= 0) {
+                    it.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                }
+            }
         }
 
+        drainCodec(mediaCodec, true)
+        if (config?.addSilentAudio == true) {
+            drainCodec(audioCodec, false)
+        }
+    }
+
+    private fun drainCodec(codec: MediaCodec?, isVideo: Boolean) {
         val bufferInfo = MediaCodec.BufferInfo()
         while (true) {
-            val encoderStatus = mediaCodec?.dequeueOutputBuffer(bufferInfo, 5000) ?: break
+            val encoderStatus = codec?.dequeueOutputBuffer(bufferInfo, 5000) ?: break
 
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                if (!endOfStream) break
+                break
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                val newFormat = mediaCodec?.outputFormat
-                videoTrackIndex = mediaMuxer?.addTrack(newFormat!!) ?: -1
-                mediaMuxer?.start()
+                val newFormat = codec.outputFormat
+                if (isVideo) {
+                    videoTrackIndex = mediaMuxer?.addTrack(newFormat) ?: -1
+                } else {
+                    audioTrackIndex = mediaMuxer?.addTrack(newFormat) ?: -1
+                }
+
+                if (videoTrackIndex != -1 && (!config!!.addSilentAudio || audioTrackIndex != -1)) {
+                    mediaMuxer?.start()
+                }
             } else if (encoderStatus >= 0) {
-                val encodedData = mediaCodec?.getOutputBuffer(encoderStatus)
+                val encodedData = codec.getOutputBuffer(encoderStatus)
                 if (encodedData != null) {
                     if (bufferInfo.size != 0) {
                         encodedData.position(bufferInfo.offset)
                         encodedData.limit(bufferInfo.offset + bufferInfo.size)
-                        mediaMuxer?.writeSampleData(videoTrackIndex, encodedData, bufferInfo)
+                        val trackIndex = if (isVideo) videoTrackIndex else audioTrackIndex
+                        mediaMuxer?.writeSampleData(trackIndex, encodedData, bufferInfo)
                     }
 
-                    mediaCodec?.releaseOutputBuffer(encoderStatus, false)
+                    codec.releaseOutputBuffer(encoderStatus, false)
                     if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) break
                 }
             }
+        }
+    }
+
+    private fun feedSilentAudio(ptsNs: Long) {
+        val codec = audioCodec ?: return
+        val inputIndex = codec.dequeueInputBuffer(5000)
+        if (inputIndex >= 0) {
+            val inputBuffer = codec.getInputBuffer(inputIndex)
+            inputBuffer?.clear()
+            val size = inputBuffer?.remaining() ?: 0
+            val silentData = ByteArray(size)
+            inputBuffer?.put(silentData)
+            codec.queueInputBuffer(inputIndex, 0, size, ptsNs / 1000, 0)
         }
     }
 
@@ -148,11 +205,8 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
             try {
                 drainEncoder(true)
                 isEncoding = false
-                mediaCodec?.stop()
-                mediaCodec?.release()
-                mediaMuxer?.stop()
-                mediaMuxer?.release()
-                renderer?.release()
+
+                mediaEncoderCleanup()
 
                 mainHandler.post { callback(Result.success(config?.outputPath)) }
             } catch (e: Exception) {
@@ -172,8 +226,28 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
         try {
             mediaCodec?.stop()
             mediaCodec?.release()
+        } catch (e: Exception) {}
+        mediaCodec = null
+
+        try {
+            audioCodec?.stop()
+            audioCodec?.release()
+        } catch (e: Exception) {}
+        audioCodec = null
+
+        try {
+            mediaMuxer?.stop()
             mediaMuxer?.release()
+        } catch (e: Exception) {}
+        mediaMuxer = null
+
+        try {
             renderer?.release()
         } catch (e: Exception) {}
+        renderer = null
+
+        inputSurface = null
+        videoTrackIndex = -1
+        audioTrackIndex = -1
     }
 }
