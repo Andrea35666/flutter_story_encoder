@@ -12,18 +12,18 @@ import Foundation
 #endif
 
 /// Error class for passing custom error details to Dart side.
-final class PigeonError: Error {
-  let code: String
-  let message: String?
-  let details: Any?
+public final class PigeonError: Error {
+  public let code: String
+  public let message: String?
+  public let details: Any?
 
-  init(code: String, message: String?, details: Any?) {
+  public init(code: String, message: String?, details: Any?) {
     self.code = code
     self.message = message
     self.details = details
   }
 
-  var localizedDescription: String {
+  public var localizedDescription: String {
     return
       "PigeonError(code: \(code), message: \(message ?? "<nil>"), details: \(details ?? "<nil>")"
       }
@@ -69,17 +69,26 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct EncoderConfig {
-  var width: Int64
-  var height: Int64
-  var fps: Int64
-  var bitrate: Int64
-  var outputPath: String
-  var addSilentAudio: Bool
+public struct EncoderConfig {
+  public var width: Int64
+  public var height: Int64
+  public var fps: Int64
+  public var bitrate: Int64
+  public var outputPath: String
+  public var addSilentAudio: Bool
+
+  public init(width: Int64, height: Int64, fps: Int64, bitrate: Int64, outputPath: String, addSilentAudio: Bool) {
+    self.width = width
+    self.height = height
+    self.fps = fps
+    self.bitrate = bitrate
+    self.outputPath = outputPath
+    self.addSilentAudio = addSilentAudio
+  }
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> EncoderConfig? {
+  public static func fromList(_ pigeonVar_list: [Any?]) -> EncoderConfig? {
     let width = pigeonVar_list[0] as! Int64
     let height = pigeonVar_list[1] as! Int64
     let fps = pigeonVar_list[2] as! Int64
@@ -96,7 +105,7 @@ struct EncoderConfig {
       addSilentAudio: addSilentAudio
     )
   }
-  func toList() -> [Any?] {
+  public func toList() -> [Any?] {
     return [
       width,
       height,
@@ -109,14 +118,20 @@ struct EncoderConfig {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct EncodingStats {
-  var framesProcessed: Int64
-  var currentFps: Double
-  var progress: Double
+public struct EncodingStats {
+  public var framesProcessed: Int64
+  public var currentFps: Double
+  public var progress: Double
+
+  public init(framesProcessed: Int64, currentFps: Double, progress: Double) {
+    self.framesProcessed = framesProcessed
+    self.currentFps = currentFps
+    self.progress = progress
+  }
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> EncodingStats? {
+  public static func fromList(_ pigeonVar_list: [Any?]) -> EncodingStats? {
     let framesProcessed = pigeonVar_list[0] as! Int64
     let currentFps = pigeonVar_list[1] as! Double
     let progress = pigeonVar_list[2] as! Double
@@ -127,7 +142,7 @@ struct EncodingStats {
       progress: progress
     )
   }
-  func toList() -> [Any?] {
+  public func toList() -> [Any?] {
     return [
       framesProcessed,
       currentFps,
@@ -136,7 +151,7 @@ struct EncodingStats {
   }
 }
 
-private class PigeonPigeonCodecReader: FlutterStandardReader {
+public class PigeonPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
     case 129:
@@ -149,7 +164,7 @@ private class PigeonPigeonCodecReader: FlutterStandardReader {
   }
 }
 
-private class PigeonPigeonCodecWriter: FlutterStandardWriter {
+public class PigeonPigeonCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
     if let value = value as? EncoderConfig {
       super.writeByte(129)
@@ -163,7 +178,7 @@ private class PigeonPigeonCodecWriter: FlutterStandardWriter {
   }
 }
 
-private class PigeonPigeonCodecReaderWriter: FlutterStandardReaderWriter {
+public class PigeonPigeonCodecReaderWriter: FlutterStandardReaderWriter {
   override func reader(with data: Data) -> FlutterStandardReader {
     return PigeonPigeonCodecReader(data: data)
   }
@@ -173,13 +188,13 @@ private class PigeonPigeonCodecReaderWriter: FlutterStandardReaderWriter {
   }
 }
 
-class PigeonPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
-  static let shared = PigeonPigeonCodec(readerWriter: PigeonPigeonCodecReaderWriter())
+public class PigeonPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
+  public static let shared = PigeonPigeonCodec(readerWriter: PigeonPigeonCodecReaderWriter())
 }
 
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol StoryEncoderHostApi {
+public protocol StoryEncoderHostApi {
   func start(config: EncoderConfig, completion: @escaping (Result<Bool, Error>) -> Void)
   func appendFrame(rgbaData: FlutterStandardTypedData, completion: @escaping (Result<Bool, Error>) -> Void)
   func finish(completion: @escaping (Result<String?, Error>) -> Void)
@@ -187,10 +202,10 @@ protocol StoryEncoderHostApi {
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
-class StoryEncoderHostApiSetup {
-  static var codec: FlutterStandardMessageCodec { PigeonPigeonCodec.shared }
+public class StoryEncoderHostApiSetup {
+  public static var codec: FlutterStandardMessageCodec { PigeonPigeonCodec.shared }
   /// Sets up an instance of `StoryEncoderHostApi` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: StoryEncoderHostApi?, messageChannelSuffix: String = "") {
+  public static func setUp(binaryMessenger: FlutterBinaryMessenger, api: StoryEncoderHostApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
     let startChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.start\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -257,14 +272,14 @@ class StoryEncoderHostApiSetup {
   }
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
-protocol StoryEncoderFlutterApiProtocol {
+public protocol StoryEncoderFlutterApiProtocol {
   func onProgress(stats statsArg: EncodingStats, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onError(message messageArg: String, code codeArg: String, completion: @escaping (Result<Void, PigeonError>) -> Void)
 }
-class StoryEncoderFlutterApi: StoryEncoderFlutterApiProtocol {
+public class StoryEncoderFlutterApi: StoryEncoderFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
   private let messageChannelSuffix: String
-  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+  public init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
     self.binaryMessenger = binaryMessenger
     self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
   }
