@@ -1,3 +1,8 @@
+## 1.1.4
+
+- **Android Hotfix**: Fixed `IllegalStateException: Can't write, muxer is not started` by implementing track synchronization and muxer lifecycle safeguards.
+- **Improved Stability**: Ensured that video and audio tracks are fully registered before the muxer begins writing sample data.
+
 ## 1.1.3
 
 - **Android Hotfix**: Fixed unresolved `program` and `textureId` references in `OpenGLRenderer.kt`.

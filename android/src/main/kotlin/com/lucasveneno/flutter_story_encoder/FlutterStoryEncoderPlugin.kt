@@ -19,6 +19,7 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
     private var videoTrackIndex = -1
     private var audioTrackIndex = -1
     private var isEncoding = false
+    private var isMuxerStarted = false
     private val executor = Executors.newSingleThreadExecutor()
 
     private var flutterApi: StoryEncoderFlutterApi? = null
@@ -95,6 +96,7 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
                         MediaMuxer(config.outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 
                 isEncoding = true
+                isMuxerStarted = false
                 mainHandler.post { callback(Result.success(true)) }
             } catch (e: Exception) {
                 mainHandler.post { callback(Result.failure(e)) }
@@ -169,8 +171,14 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
 
                 if (videoTrackIndex != -1 && (!config!!.addSilentAudio || audioTrackIndex != -1)) {
                     mediaMuxer?.start()
+                    isMuxerStarted = true
                 }
             } else if (encoderStatus >= 0) {
+                if (!isMuxerStarted) {
+                    // Muxer not started yet, release and wait for INFO_OUTPUT_FORMAT_CHANGED
+                    codec.releaseOutputBuffer(encoderStatus, false)
+                    continue
+                }
                 val encodedData = codec.getOutputBuffer(encoderStatus)
                 if (encodedData != null) {
                     if (bufferInfo.size != 0) {
@@ -256,5 +264,6 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
         inputSurface = null
         videoTrackIndex = -1
         audioTrackIndex = -1
+        isMuxerStarted = false
     }
 }
