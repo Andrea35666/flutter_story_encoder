@@ -2,7 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
-package com.w30.flutter_story_encoder
+package com.lucasveneno.flutter_story_encoder
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel

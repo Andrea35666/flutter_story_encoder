@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Renamed Android package to `com.lucasveneno.flutter_story_encoder`.
+
 ## 1.0.2
 
 - Fixed Android Kotlin compilation error ("Property must be initialized").

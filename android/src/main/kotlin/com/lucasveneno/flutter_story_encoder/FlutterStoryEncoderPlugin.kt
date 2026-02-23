@@ -1,4 +1,4 @@
-package com.w30.flutter_story_encoder
+package com.lucasveneno.flutter_story_encoder
 
 import android.media.MediaCodec
 import android.media.MediaCodecInfo

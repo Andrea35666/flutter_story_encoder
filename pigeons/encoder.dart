@@ -7,8 +7,10 @@ import 'package:pigeon/pigeon.dart';
     objcHeaderOut: 'ios/Classes/pigeon.g.h',
     objcSourceOut: 'ios/Classes/pigeon.g.m',
     kotlinOut:
-        'android/src/main/kotlin/com/w30/flutter_story_encoder/Pigeon.g.kt',
-    kotlinOptions: KotlinOptions(package: 'com.w30.flutter_story_encoder'),
+        'android/src/main/kotlin/com/lucasveneno/flutter_story_encoder/Pigeon.g.kt',
+    kotlinOptions: KotlinOptions(
+      package: 'com.lucasveneno.flutter_story_encoder',
+    ),
   ),
 )
 class EncoderConfig {

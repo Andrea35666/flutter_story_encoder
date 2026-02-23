@@ -25,9 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    if (project.android.hasProperty("namespace")) {
-        namespace 'com.w30.flutter_story_encoder'
-    }
+    namespace 'com.lucasveneno.flutter_story_encoder'
 
     compileSdk 34
 
