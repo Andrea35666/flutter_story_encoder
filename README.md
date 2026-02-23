@@ -32,7 +32,7 @@ Add `flutter_story_encoder` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_story_encoder: ^1.1.2
+  flutter_story_encoder: ^1.1.5
 ```
 
 ### iOS Requirements
