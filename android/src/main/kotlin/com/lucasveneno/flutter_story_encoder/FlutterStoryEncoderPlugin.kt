@@ -35,6 +35,7 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         StoryEncoderHostApi.setUp(binding.binaryMessenger, null)
+        executor.shutdown()
     }
 
     override fun start(config: EncoderConfig, callback: (Result<Boolean>) -> Unit) {

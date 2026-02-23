@@ -30,9 +30,24 @@ void main() {
         addSilentAudio: true,
       );
 
-      // Verify logic... (In a real test, we'd use Pigeon's TestApi)
       expect(config.width, 1080);
+      expect(config.height, 1920);
+      expect(config.fps, 30);
+      expect(config.bitrate, 10000000);
+      expect(config.outputPath, 'test.mp4');
       expect(config.addSilentAudio, true);
+    });
+
+    test('EncodingStats model serialization', () {
+      final stats = EncodingStats(
+        framesProcessed: 100,
+        currentFps: 29.5,
+        progress: 0.5,
+      );
+
+      expect(stats.framesProcessed, 100);
+      expect(stats.currentFps, 29.5);
+      expect(stats.progress, 0.5);
     });
   });
 }

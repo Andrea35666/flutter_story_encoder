@@ -1,3 +1,8 @@
+## 1.1.1
+
+- **Android Optimization**: Implemented buffer reuse in `OpenGLRenderer` to eliminate frame-level allocations and reduce GC pressure during high-resolution exports.
+- **Improved Lifecycle**: Properly shut down background executor on Android when plugin is detached.
+
 ## 1.1.0
 
 - **Commercial Grade Release**: Refactored both platforms for hardware-accelerated production use.

@@ -14,8 +14,15 @@ class OpenGLRenderer(
     private var eglContext = EGL14.EGL_NO_CONTEXT
     private var eglSurface = EGL14.EGL_NO_SURFACE
 
-    private var program = 0
-    private var textureId = 0
+    private var rgbaBuffer: ByteBuffer? = null
+    private val rectBuffer: ByteBuffer =
+            ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder()).apply {
+                asFloatBuffer().put(floatArrayOf(-1f, -1f, 1f, -1f, -1f, 1f, 1f, 1f)).position(0)
+            }
+    private val texBuffer: ByteBuffer =
+            ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder()).apply {
+                asFloatBuffer().put(floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f, 1f, 1f)).position(0)
+            }
 
     init {
         initEGL()
@@ -105,35 +112,31 @@ class OpenGLRenderer(
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         GLES20.glUseProgram(program)
 
-        // Zero-copy optimization: Reuse buffer if possible, or use direct allocation
-        val buffer = ByteBuffer.allocateDirect(rgbaData.size)
-        buffer.order(ByteOrder.nativeOrder())
-        buffer.put(rgbaData)
-        buffer.position(0)
+        // Reuse buffer for zero-allocation frame processing
+        if (rgbaBuffer == null || rgbaBuffer?.capacity() != rgbaData.size) {
+            rgbaBuffer = ByteBuffer.allocateDirect(rgbaData.size)
+            rgbaBuffer?.order(ByteOrder.nativeOrder())
+        }
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
-        GLES20.glTexImage2D(
-                GLES20.GL_TEXTURE_2D,
-                0,
-                GLES20.GL_RGBA,
-                width,
-                height,
-                0,
-                GLES20.GL_RGBA,
-                GLES20.GL_UNSIGNED_BYTE,
-                buffer
-        )
+        rgbaBuffer?.let {
+            it.clear()
+            it.put(rgbaData)
+            it.position(0)
 
-        val rectBuffer =
-                ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
-        rectBuffer.put(floatArrayOf(-1f, -1f, 1f, -1f, -1f, 1f, 1f, 1f))
-        rectBuffer.position(0)
-
-        val texBuffer =
-                ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
-        texBuffer.put(floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f, 1f, 1f))
-        texBuffer.position(0)
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
+            GLES20.glTexImage2D(
+                    GLES20.GL_TEXTURE_2D,
+                    0,
+                    GLES20.GL_RGBA,
+                    width,
+                    height,
+                    0,
+                    GLES20.GL_RGBA,
+                    GLES20.GL_UNSIGNED_BYTE,
+                    it
+            )
+        }
 
         val posHandle = GLES20.glGetAttribLocation(program, "aPosition")
         GLES20.glEnableVertexAttribArray(posHandle)
