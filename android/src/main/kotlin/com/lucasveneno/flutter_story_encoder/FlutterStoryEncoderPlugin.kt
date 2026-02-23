@@ -4,6 +4,8 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import android.os.Handler
+import android.os.Looper
 import android.view.Surface
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import java.io.File
@@ -33,6 +35,7 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
     }
 
     override fun start(config: EncoderConfig, callback: (Result<Boolean>) -> Unit) {
+        val mainHandler = Handler(Looper.getMainLooper())
         executor.execute {
             try {
                 this.config = config
@@ -74,16 +77,17 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
                         MediaMuxer(config.outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 
                 isEncoding = true
-                callback(Result.success(true))
+                mainHandler.post { callback(Result.success(true)) }
             } catch (e: Exception) {
-                callback(Result.failure(e))
+                mainHandler.post { callback(Result.failure(e)) }
             }
         }
     }
 
     override fun appendFrame(rgbaData: ByteArray, callback: (Result<Boolean>) -> Unit) {
+        val mainHandler = Handler(Looper.getMainLooper())
         if (!isEncoding) {
-            callback(Result.success(false))
+            mainHandler.post { callback(Result.success(false)) }
             return
         }
 
@@ -96,13 +100,13 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
                 renderer?.render(rgbaData, ptsNs)
 
                 framesProcessed++
-
                 val stats = EncodingStats(framesProcessed, config?.fps?.toDouble() ?: 30.0, 0.0)
-                flutterApi?.onProgress(stats) {}
-
-                callback(Result.success(true))
+                mainHandler.post {
+                    flutterApi?.onProgress(stats) {}
+                    callback(Result.success(true))
+                }
             } catch (e: Exception) {
-                callback(Result.failure(e))
+                mainHandler.post { callback(Result.failure(e)) }
             }
         }
     }
@@ -139,6 +143,7 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
     }
 
     override fun finish(callback: (Result<String?>) -> Unit) {
+        val mainHandler = Handler(Looper.getMainLooper())
         executor.execute {
             try {
                 drainEncoder(true)
@@ -149,9 +154,9 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
                 mediaMuxer?.release()
                 renderer?.release()
 
-                callback(Result.success(config?.outputPath))
+                mainHandler.post { callback(Result.success(config?.outputPath)) }
             } catch (e: Exception) {
-                callback(Result.failure(e))
+                mainHandler.post { callback(Result.failure(e)) }
             }
         }
     }

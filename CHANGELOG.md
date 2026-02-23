@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Fixed Android `@UiThread` exception by ensuring progress updates and completion callbacks run on the main thread.
+
 ## 1.0.3
 
 - Renamed Android package to `com.lucasveneno.flutter_story_encoder`.
