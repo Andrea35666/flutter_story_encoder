@@ -187,6 +187,8 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
         }
     }
 
+    private var silentAudioBuffer: ByteArray? = null
+
     private fun feedSilentAudio(ptsNs: Long) {
         val codec = audioCodec ?: return
         val inputIndex = codec.dequeueInputBuffer(5000)
@@ -194,8 +196,12 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
             val inputBuffer = codec.getInputBuffer(inputIndex)
             inputBuffer?.clear()
             val size = inputBuffer?.remaining() ?: 0
-            val silentData = ByteArray(size)
-            inputBuffer?.put(silentData)
+
+            if (silentAudioBuffer == null || silentAudioBuffer?.size != size) {
+                silentAudioBuffer = ByteArray(size)
+            }
+
+            inputBuffer?.put(silentAudioBuffer!!)
             codec.queueInputBuffer(inputIndex, 0, size, ptsNs / 1000, 0)
         }
     }

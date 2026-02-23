@@ -1,3 +1,9 @@
+## 1.1.2
+
+- **iOS Hotfix**: Fixed color channel swap (Blue/Red) when encoding from Flutter raw RGBA frames.
+- **iOS Stability**: Fixed potential crash by resetting memory pools between encoding sessions.
+- **Android Performance**: Optimized silent audio track generation by reusing zero-buffers.
+
 ## 1.1.1
 
 - **Android Optimization**: Implemented buffer reuse in `OpenGLRenderer` to eliminate frame-level allocations and reduce GC pressure during high-resolution exports.

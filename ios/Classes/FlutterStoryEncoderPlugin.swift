@@ -33,6 +33,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
     private func _start(config: EncoderConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
         self.config = config
         self.framesProcessed = 0
+        self.pixelBufferPool = nil
         self.frameTime = .zero
         self.audioTime = .zero
         
@@ -143,11 +144,18 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         CVPixelBufferLockBaseAddress(buffer, [])
         let baseAddress = CVPixelBufferGetBaseAddress(buffer)
         
-        data.withUnsafeBytes { pointer in
-            let rawPointer = pointer.baseAddress!
-            // Optimised memory swizzle: RGBA to BGRA if necessary, or direct copy for BGRA
-            // In a high-scale app, we'd use vImage or Accelerate here if formats differ.
-            memcpy(baseAddress, rawPointer, data.count)
+        data.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) in
+            let rawPointer = pointer.baseAddress!.assumingMemoryBound(to: UInt8.self)
+            let bgrPointer = baseAddress!.assumingMemoryBound(to: UInt8.self)
+            
+            // Fast swizzle RGBA -> BGRA
+            // B = R[2], G = R[1], R = R[0], A = R[3]
+            for i in stride(from: 0, to: data.count, by: 4) {
+                bgrPointer[i] = rawPointer[i + 2]     // Blue
+                bgrPointer[i + 1] = rawPointer[i + 1] // Green
+                bgrPointer[i + 2] = rawPointer[i]     // Red
+                bgrPointer[i + 3] = rawPointer[i + 3] // Alpha
+            }
         }
         
         CVPixelBufferUnlockBaseAddress(buffer, [])

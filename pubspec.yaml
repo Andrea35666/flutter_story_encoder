@@ -1,6 +1,11 @@
 name: flutter_story_encoder
 description: Production-grade, hardware-accelerated video export engine for social media stories on iOS (AVFoundation) and Android (MediaCodec).
-version: 1.1.1
+version: 1.1.2
+# Changelog for 1.1.2 (Audit fixes):
+# - iOS Hotfix: Fixed color channel swap (Blue/Red) when encoding from Flutter raw RGBA frames.
+# - iOS Stability: Fixed potential crash by resetting memory pools between encoding sessions.
+# - Android Performance: Optimized silent audio track generation by reusing zero-buffers.
+# Previous version: 1.1.1
 homepage: https://github.com/lucasveneno/flutter_story_encoder
 repository: https://github.com/lucasveneno/flutter_story_encoder
 issue_tracker: https://github.com/lucasveneno/flutter_story_encoder/issues
