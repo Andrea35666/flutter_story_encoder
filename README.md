@@ -32,7 +32,7 @@ Add `flutter_story_encoder` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_story_encoder: ^1.0.0
+  flutter_story_encoder: ^1.1.1
 ```
 
 ### iOS Requirements
@@ -85,6 +85,15 @@ For the best results in high-scale apps:
 1. **Resolution**: Match your `RepaintBoundary` pixel ratio to the target resolution to avoid expensive software scaling.
 2. **Bitrate**: 10-15 Mbps is recommended for 1080p high-quality stories.
 3. **Pacing**: Use `Future.delayed(Duration.zero)` between frame captures to allow the Flutter UI thread to breathe.
+
+## Technical Specifications
+
+- **Video Codec**: H.264 / AVC
+- **Audio Codec**: AAC (Silent track for compatibility)
+- **Profile**: High Profile 4.1
+- **Keyframe Interval**: 1 second
+- **Rate Control**: VBR (Variable Bitrate) with target matching
+- **Color Space**: BT.709
 
 ## License
 
