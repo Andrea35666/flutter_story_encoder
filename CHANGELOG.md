@@ -1,3 +1,7 @@
+## 1.0.1
+
+- Updated repository metadata and documentation.
+
 ## 1.0.0
 
 - Initial release of the high-performance video export engine.
