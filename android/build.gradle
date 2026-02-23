@@ -1,4 +1,4 @@
-group 'com.w30.flutter_story_encoder'
+group 'com.lucasveneno.flutter_story_encoder'
 version '1.0-SNAPSHOT'
 
 buildscript {

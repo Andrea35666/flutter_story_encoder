@@ -10,7 +10,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
     
     private var frameTime: CMTime = .zero
     private var isEncoding = false
-    private let queue = DispatchQueue(label: "com.w30.flutter_story_encoder.queue")
+    private let queue = DispatchQueue(label: "com.lucasveneno.flutter_story_encoder.queue")
     
     private var flutterApi: StoryEncoderFlutterApi?
     private var config: EncoderConfig?

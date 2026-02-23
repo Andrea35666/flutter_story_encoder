@@ -23,7 +23,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.w30.flutter_story_encoder
+        package: com.lucasveneno.flutter_story_encoder
         pluginClass: FlutterStoryEncoderPlugin
       ios:
         pluginClass: FlutterStoryEncoderPlugin
