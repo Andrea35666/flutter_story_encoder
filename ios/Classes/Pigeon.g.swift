@@ -152,7 +152,7 @@ public struct EncodingStats {
 }
 
 public class PigeonPigeonCodecReader: FlutterStandardReader {
-  override func readValue(ofType type: UInt8) -> Any? {
+  public override func readValue(ofType type: UInt8) -> Any? {
     switch type {
     case 129:
       return EncoderConfig.fromList(self.readValue() as! [Any?])
@@ -165,7 +165,7 @@ public class PigeonPigeonCodecReader: FlutterStandardReader {
 }
 
 public class PigeonPigeonCodecWriter: FlutterStandardWriter {
-  override func writeValue(_ value: Any) {
+  public override func writeValue(_ value: Any) {
     if let value = value as? EncoderConfig {
       super.writeByte(129)
       super.writeValue(value.toList())
@@ -179,11 +179,11 @@ public class PigeonPigeonCodecWriter: FlutterStandardWriter {
 }
 
 public class PigeonPigeonCodecReaderWriter: FlutterStandardReaderWriter {
-  override func reader(with data: Data) -> FlutterStandardReader {
+  public override func reader(with data: Data) -> FlutterStandardReader {
     return PigeonPigeonCodecReader(data: data)
   }
 
-  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+  public override func writer(with data: NSMutableData) -> FlutterStandardWriter {
     return PigeonPigeonCodecWriter(data: data)
   }
 }
@@ -283,10 +283,10 @@ public class StoryEncoderFlutterApi: StoryEncoderFlutterApiProtocol {
     self.binaryMessenger = binaryMessenger
     self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
   }
-  var codec: PigeonPigeonCodec {
+  public var codec: PigeonPigeonCodec {
     return PigeonPigeonCodec.shared
   }
-  func onProgress(stats statsArg: EncodingStats, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  public func onProgress(stats statsArg: EncodingStats, completion: @escaping (Result<Void, PigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onProgress\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([statsArg] as [Any?]) { response in
@@ -304,7 +304,7 @@ public class StoryEncoderFlutterApi: StoryEncoderFlutterApiProtocol {
       }
     }
   }
-  func onError(message messageArg: String, code codeArg: String, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  public func onError(message messageArg: String, code codeArg: String, completion: @escaping (Result<Void, PigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([messageArg, codeArg] as [Any?]) { response in
