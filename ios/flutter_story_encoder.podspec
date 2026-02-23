@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
   s.name             = 'flutter_story_encoder'
   s.version          = '1.1.4'
-  s.summary          = 'A new Flutter plugin project.'
+  s.summary          = 'A production-grade, hardware-accelerated video export engine for Flutter.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+  A production-grade, hardware-accelerated video export engine for Flutter. Specifically designed for high-scale social media story editors requiring premium performance, thermal stability, and 4K capability.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'http://lucasveneno.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Lucas Veneno' => 'webmaster@lucasveneno.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
