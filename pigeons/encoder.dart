@@ -4,8 +4,7 @@ import 'package:pigeon/pigeon.dart';
   PigeonOptions(
     dartOut: 'lib/src/pigeon.g.dart',
     dartTestOut: 'test/pigeon.g.dart',
-    objcHeaderOut: 'ios/Classes/pigeon.g.h',
-    objcSourceOut: 'ios/Classes/pigeon.g.m',
+    swiftOut: 'ios/Classes/Pigeon.g.swift',
     kotlinOut:
         'android/src/main/kotlin/com/lucasveneno/flutter_story_encoder/Pigeon.g.kt',
     kotlinOptions: KotlinOptions(

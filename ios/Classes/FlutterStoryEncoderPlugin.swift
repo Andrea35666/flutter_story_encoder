@@ -20,7 +20,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = FlutterStoryEncoderPlugin()
-        StoryEncoderHostApiSetup.setUp(registrar.messenger(), api: instance)
+        StoryEncoderHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: instance)
         instance.flutterApi = StoryEncoderFlutterApi(binaryMessenger: registrar.messenger())
     }
     
@@ -94,7 +94,8 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
                 isEncoding = true
                 completion(.success(true))
             } else {
-                completion(.failure(FlutterError(code: "START_FAILED", message: assetWriter?.error?.localizedDescription ?? "Unknown", details: nil)))
+                let error = PigeonError(code: "START_FAILED", message: assetWriter?.error?.localizedDescription ?? "Unknown", details: nil)
+                completion(.failure(error))
             }
         } catch {
             completion(.failure(error))
@@ -137,7 +138,8 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         let status = CVPixelBufferPoolCreatePixelBuffer(nil, pixelBufferPool!, &pixelBuffer)
         
         guard status == kCVReturnSuccess, let buffer = pixelBuffer else {
-            completion(.failure(FlutterError(code: "POOL_ERROR", message: "Memory pool expansion failed", details: nil)))
+            let error = PigeonError(code: "POOL_ERROR", message: "Memory pool expansion failed", details: nil)
+            completion(.failure(error))
             return
         }
         
@@ -176,7 +178,8 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
             }
             completion(.success(true))
         } else {
-            completion(.failure(FlutterError(code: "APPEND_FAILED", message: assetWriter?.error?.localizedDescription ?? "Unknown", details: nil)))
+            let error = PigeonError(code: "APPEND_FAILED", message: assetWriter?.error?.localizedDescription ?? "Unknown", details: nil)
+            completion(.failure(error))
         }
     }
     
@@ -221,9 +224,10 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
                 allocator: kCFAllocatorDefault,
                 dataBuffer: blockBuffer,
                 formatDescription: formatDesc,
-                numSamples: samplesCount,
-                sampleCount: 1,
+                sampleCount: samplesCount,
+                sampleTimingEntryCount: 0,
                 sampleTimingArray: nil,
+                sampleSizeEntryCount: 0,
                 sampleSizeArray: nil,
                 sampleBufferOut: &sampleBuffer
             )
@@ -243,13 +247,14 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
                 if self.assetWriter?.status == .completed {
                     completion(.success(self.config?.outputPath))
                 } else {
-                    completion(.failure(FlutterError(code: "FINISH_FAILED", message: self.assetWriter?.error?.localizedDescription ?? "Unknown", details: nil)))
+                    let error = PigeonError(code: "FINISH_FAILED", message: self.assetWriter?.error?.localizedDescription ?? "Unknown", details: nil)
+                    completion(.failure(error))
                 }
             }
         }
     }
     
-    public func cancel() {
+    public func cancel() throws {
         queue.async {
             self.isEncoding = false
             self.assetWriter?.cancelWriting()

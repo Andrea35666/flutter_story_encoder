@@ -1,6 +1,6 @@
 name: flutter_story_encoder
 description: A production-grade, hardware-accelerated video export engine for Flutter. Specifically designed for high-scale social media story editors requiring premium performance, thermal stability, and 4K capability.
-version: 1.1.4
+version: 1.1.5
 # Changelog for 1.1.2 (Audit fixes):
 # - iOS Hotfix: Fixed color channel swap (Blue/Red) when encoding from Flutter raw RGBA frames.
 # - iOS Stability: Fixed potential crash by resetting memory pools between encoding sessions.

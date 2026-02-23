@@ -9,3 +9,5 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_story_encoder/src/pigeon.g.dart';
+
+// Removed unused _PigeonCodec

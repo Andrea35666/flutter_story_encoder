@@ -1,3 +1,9 @@
+## 1.1.5
+
+- iOS: Switched Pigeon to Swift generation to resolve scope visibility issues.
+- iOS: Fixed `CMSampleBufferCreateReady` parameters for silent audio generation.
+- iOS: Improved error handling by using `PigeonError` for better type compatibility.
+
 ## 1.1.4
 
 - **Android Hotfix**: Fixed `IllegalStateException: Can't write, muxer is not started` by implementing track synchronization and muxer lifecycle safeguards.

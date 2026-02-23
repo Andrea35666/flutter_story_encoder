@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'flutter_story_encoder'
-  s.version          = '1.1.4'
+  s.version          = '1.1.5'
   s.summary          = 'A production-grade, hardware-accelerated video export engine for Flutter.'
   s.description      = <<-DESC
   A production-grade, hardware-accelerated video export engine for Flutter. Specifically designed for high-scale social media story editors requiring premium performance, thermal stability, and 4K capability.
