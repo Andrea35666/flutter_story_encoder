@@ -10,15 +10,15 @@ import java.io.File
 import java.util.concurrent.Executors
 
 class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
-    private var mediaCodec: MediaCodec?
-    private var mediaMuxer: MediaMuxer?
-    private var inputSurface: Surface?
+    private var mediaCodec: MediaCodec? = null
+    private var mediaMuxer: MediaMuxer? = null
+    private var inputSurface: Surface? = null
     private var videoTrackIndex = -1
     private var isEncoding = false
     private val executor = Executors.newSingleThreadExecutor()
 
-    private var flutterApi: StoryEncoderFlutterApi?
-    private var config: EncoderConfig?
+    private var flutterApi: StoryEncoderFlutterApi? = null
+    private var config: EncoderConfig? = null
     private var framesProcessed: Long = 0
 
     private var renderer: OpenGLRenderer? = null

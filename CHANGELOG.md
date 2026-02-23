@@ -1,3 +1,7 @@
+## 1.0.2
+
+- Fixed Android Kotlin compilation error ("Property must be initialized").
+
 ## 1.0.1
 
 - Updated repository metadata and documentation.
