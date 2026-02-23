@@ -15,7 +15,11 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
-List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse({
+  Object? result,
+  PlatformException? error,
+  bool empty = false,
+}) {
   if (empty) {
     return <Object?>[];
   }
@@ -48,14 +52,7 @@ class EncoderConfig {
   bool addSilentAudio;
 
   Object encode() {
-    return <Object?>[
-      width,
-      height,
-      fps,
-      bitrate,
-      outputPath,
-      addSilentAudio,
-    ];
+    return <Object?>[width, height, fps, bitrate, outputPath, addSilentAudio];
   }
 
   static EncoderConfig decode(Object result) {
@@ -85,11 +82,7 @@ class EncodingStats {
   double progress;
 
   Object encode() {
-    return <Object?>[
-      framesProcessed,
-      currentFps,
-      progress,
-    ];
+    return <Object?>[framesProcessed, currentFps, progress];
   }
 
   static EncodingStats decode(Object result) {
@@ -102,7 +95,6 @@ class EncodingStats {
   }
 }
 
-
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -110,10 +102,10 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is EncoderConfig) {
+    } else if (value is EncoderConfig) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    }    else if (value is EncodingStats) {
+    } else if (value is EncodingStats) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else {
@@ -124,9 +116,9 @@ class _PigeonCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 129: 
+      case 129:
         return EncoderConfig.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return EncodingStats.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -138,9 +130,13 @@ class StoryEncoderHostApi {
   /// Constructor for [StoryEncoderHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  StoryEncoderHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  StoryEncoderHostApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
+           ? '.$messageChannelSuffix'
+           : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -148,12 +144,14 @@ class StoryEncoderHostApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<bool> start(EncoderConfig config) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.start$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.start$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_channel.send(<Object?>[config]) as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -175,12 +173,14 @@ class StoryEncoderHostApi {
   }
 
   Future<bool> appendFrame(Uint8List rgbaData) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.appendFrame$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.appendFrame$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_channel.send(<Object?>[rgbaData]) as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -202,12 +202,14 @@ class StoryEncoderHostApi {
   }
 
   Future<String?> finish() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.finish$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.finish$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_channel.send(null) as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -224,12 +226,14 @@ class StoryEncoderHostApi {
   }
 
   Future<void> cancel() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.cancel$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.cancel$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_channel.send(null) as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -253,57 +257,83 @@ abstract class StoryEncoderFlutterApi {
 
   void onError(String message, String code);
 
-  static void setUp(StoryEncoderFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    StoryEncoderFlutterApi? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty
+        ? '.$messageChannelSuffix'
+        : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onProgress$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onProgress$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onProgress was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onProgress was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final EncodingStats? arg_stats = (args[0] as EncodingStats?);
-          assert(arg_stats != null,
-              'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onProgress was null, expected non-null EncodingStats.');
+          assert(
+            arg_stats != null,
+            'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onProgress was null, expected non-null EncodingStats.',
+          );
           try {
             api.onProgress(arg_stats!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_message = (args[0] as String?);
-          assert(arg_message != null,
-              'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError was null, expected non-null String.');
+          assert(
+            arg_message != null,
+            'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError was null, expected non-null String.',
+          );
           final String? arg_code = (args[1] as String?);
-          assert(arg_code != null,
-              'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError was null, expected non-null String.');
+          assert(
+            arg_code != null,
+            'Argument for dev.flutter.pigeon.flutter_story_encoder.StoryEncoderFlutterApi.onError was null, expected non-null String.',
+          );
           try {
             api.onError(arg_message!, arg_code!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
