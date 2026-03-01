@@ -1,4 +1,4 @@
-## 1.1.6
+## 1.1.7
 
 - **macOS**: Added full macOS platform support with native `AVFoundation`-backed Swift implementation.
 - **SPM (iOS & macOS)**: Added Swift Package Manager support at the correct paths (`ios/flutter_story_encoder/Package.swift`, `macos/flutter_story_encoder/Package.swift`).
@@ -6,6 +6,13 @@
 - **README**: Rewrote with full API reference tables, step-by-step usage, and updated platform support matrix.
 - **Example**: Added a complete example project with real `RepaintBoundary`-based frame capture demonstrating the full encode lifecycle.
 - **pubspec**: Shortened description for better pub.dev search visibility.
+
+## 1.1.6
+
+- **Score Improvement**: Shortened package description in `pubspec.yaml` for better search visibility.
+- **Documentation**: Added comprehensive dartdoc comments to the public API and Pigeon definitions.
+- **iOS**: Added Swift Package Manager (SPM) support declaration.
+- **Example**: Added a complete example project demonstrating high-performance encoding.
 
 ## 1.1.5
 

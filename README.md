@@ -31,7 +31,7 @@ A high-performance, hardware-accelerated video encoding engine for Flutter stori
 
 ```yaml
 dependencies:
-  flutter_story_encoder: ^1.1.6
+  flutter_story_encoder: ^1.1.7
 ```
 
 ### iOS Requirements
