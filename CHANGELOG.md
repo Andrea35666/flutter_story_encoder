@@ -1,3 +1,10 @@
+## 1.1.6
+
+- **Score Improvement**: Shortened package description in `pubspec.yaml` for better search visibility.
+- **Documentation**: Added comprehensive dartdoc comments to the public API and Pigeon definitions.
+- **iOS**: Added Swift Package Manager (SPM) support declaration.
+- **Example**: Added a complete example project demonstrating high-performance encoding.
+
 ## 1.1.5
 
 - iOS: Switched Pigeon to Swift generation to resolve scope visibility issues.

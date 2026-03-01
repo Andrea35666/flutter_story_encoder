@@ -1,0 +1,22 @@
+name: flutter_story_encoder_example
+description: Demonstrates how to use the flutter_story_encoder plugin.
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.10.7 <4.0.0"
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_story_encoder:
+    path: ../
+  path_provider: ^2.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

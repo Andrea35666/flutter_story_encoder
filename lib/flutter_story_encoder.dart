@@ -1,8 +1,15 @@
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'src/pigeon.g.dart';
 
 export 'src/pigeon.g.dart';
 
+/// A production-grade, hardware-accelerated video export engine for Flutter.
+///
+/// This plugin provides a high-performance bridge to native encoding APIs:
+/// `AVFoundation` on iOS and `MediaCodec` on Android. It is specifically
+/// architected for high-scale story editors requiring 4K capability, thermal
+/// stability through backpressure management, and zero-copy GPU pipelines.
 class FlutterStoryEncoder implements StoryEncoderFlutterApi {
   static final FlutterStoryEncoder _instance = FlutterStoryEncoder._internal();
   static final StoryEncoderHostApi _hostApi = StoryEncoderHostApi();
