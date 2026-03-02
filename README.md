@@ -31,7 +31,7 @@ A high-performance, hardware-accelerated video encoding engine for Flutter stori
 
 ```yaml
 dependencies:
-  flutter_story_encoder: ^1.1.7
+  flutter_story_encoder: ^1.2.0
 ```
 
 ### iOS Requirements
@@ -85,7 +85,10 @@ import 'dart:ui' as ui;
 final RenderRepaintBoundary boundary =
     key.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
-final ui.Image image = await boundary.toImage(pixelRatio: 1.0);
+// Best Practice: Capture at exact target dimensions
+final double pixelRatio = targetWidth / boundary.size.width;
+final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+
 final ByteData? byteData =
     await image.toByteData(format: ui.ImageByteFormat.rawRgba);
 

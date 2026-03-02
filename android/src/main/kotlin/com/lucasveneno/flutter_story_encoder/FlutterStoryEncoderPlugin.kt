@@ -116,6 +116,15 @@ class FlutterStoryEncoderPlugin : FlutterPlugin, StoryEncoderHostApi {
                 drainEncoder(false)
 
                 // Deterministic PTS calculation (in nanoseconds for EGL)
+                val expectedSize =
+                        (config?.width?.toInt() ?: 0) * (config?.height?.toInt() ?: 0) * 4
+                if (rgbaData.size != expectedSize) {
+                    android.util.Log.e(
+                            "FlutterStoryEncoder",
+                            "Data size mismatch! Expected: $expectedSize, Got: ${rgbaData.size}"
+                    )
+                }
+
                 val ptsNs = videoFramesProcessed * 1000000000L / (config?.fps ?: 30)
                 renderer?.render(rgbaData, ptsNs)
 

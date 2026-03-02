@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_story_encoder/flutter_story_encoder.dart';
-import 'package:flutter_story_encoder/src/pigeon.g.dart';
 import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
 import 'flutter_story_encoder_test.mocks.dart';
 
@@ -15,13 +15,13 @@ void main() {
 
     setUp(() {
       mockApi = MockStoryEncoderHostApi();
-      // Set up the mock API for Pigeon.
-      // We use TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      // as a mock BinaryMessenger for simplicity in tests.
-      // StoryEncoderHostApi doesn't have a setUp method in Dart Pigeon generated code.
-      // We mock the channel manually if needed, or rely on the mockApi if we were using it via DI.
-      // For Pigeon host APIs, we usually mock the binary messenger or use the generated test class if available.
-      // Since we want to mock the behavior of hostApi.start etc., we can use basic message channel mocking.
+
+      // Default stubbing for Mockito
+      when(mockApi.start(any)).thenAnswer((_) async => true);
+      when(mockApi.appendFrame(any)).thenAnswer((_) async => true);
+      when(mockApi.finish()).thenAnswer((_) async => 'test.mp4');
+
+      // Set up the mock binary messenger handler for Pigeon host API calls
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMessageHandler(
             'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.start',
@@ -31,6 +31,21 @@ void main() {
                       as List<Object?>;
               final EncoderConfig config = args[0] as EncoderConfig;
               final result = await mockApi.start(config);
+              return StoryEncoderHostApi.pigeonChannelCodec.encodeMessage([
+                result,
+              ]);
+            },
+          );
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMessageHandler(
+            'dev.flutter.pigeon.flutter_story_encoder.StoryEncoderHostApi.appendFrame',
+            (ByteData? message) async {
+              final List<Object?> args =
+                  StoryEncoderHostApi.pigeonChannelCodec.decodeMessage(message!)
+                      as List<Object?>;
+              final Uint8List data = args[0] as Uint8List;
+              final result = await mockApi.appendFrame(data);
               return StoryEncoderHostApi.pigeonChannelCodec.encodeMessage([
                 result,
               ]);
@@ -48,12 +63,68 @@ void main() {
         addSilentAudio: true,
       );
 
-      expect(config.width, 1080);
-      expect(config.height, 1920);
-      expect(config.fps, 30);
-      expect(config.bitrate, 10000000);
-      expect(config.outputPath, 'test.mp4');
-      expect(config.addSilentAudio, true);
+      final result = await FlutterStoryEncoder.start(config: config);
+      expect(result, isTrue);
+      verify(
+        mockApi.start(
+          argThat(
+            isA<EncoderConfig>()
+                .having((c) => c.width, 'width', 1080)
+                .having((c) => c.height, 'height', 1920),
+          ),
+        ),
+      ).called(1);
+    });
+
+    test('start throws ArgumentError for odd dimensions', () async {
+      final config = EncoderConfig(
+        width: 1081,
+        height: 1920,
+        fps: 30,
+        bitrate: 10000000,
+        outputPath: 'test.mp4',
+        addSilentAudio: true,
+      );
+
+      expect(
+        () => FlutterStoryEncoder.start(config: config),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('must be even'),
+          ),
+        ),
+      );
+    });
+
+    test('start throws ArgumentError for non-positive values', () async {
+      final config = EncoderConfig(
+        width: 1080,
+        height: 0,
+        fps: 30,
+        bitrate: 10000000,
+        outputPath: 'test.mp4',
+        addSilentAudio: true,
+      );
+
+      expect(
+        () => FlutterStoryEncoder.start(config: config),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('must be positive'),
+          ),
+        ),
+      );
+    });
+
+    test('appendFrame calls native and returns true', () async {
+      final data = Uint8List(10);
+      final result = await FlutterStoryEncoder.appendFrame(data);
+      expect(result, isTrue);
+      verify(mockApi.appendFrame(data)).called(1);
     });
 
     test('EncodingStats model serialization', () {

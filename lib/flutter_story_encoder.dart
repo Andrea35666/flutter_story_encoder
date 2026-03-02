@@ -31,6 +31,26 @@ class FlutterStoryEncoder implements StoryEncoderFlutterApi {
     Function(EncodingStats)? onProgress,
     Function(String, String)? onError,
   }) async {
+    // Basic validation to prevent native crashes or undefined behavior.
+    if (config.width <= 0 || config.height <= 0) {
+      throw ArgumentError('Width and height must be positive.');
+    }
+    if (config.width % 2 != 0 || config.height % 2 != 0) {
+      // Most hardware encoders (H.264) require even dimensions.
+      throw ArgumentError(
+        'Width and height must be even for hardware encoding.',
+      );
+    }
+    if (config.fps <= 0) {
+      throw ArgumentError('FPS must be positive.');
+    }
+    if (config.bitrate <= 0) {
+      throw ArgumentError('Bitrate must be positive.');
+    }
+    if (config.outputPath.isEmpty) {
+      throw ArgumentError('Output path cannot be empty.');
+    }
+
     _onProgressCallback = onProgress;
     _onErrorCallback = onError;
     return await _hostApi.start(config);

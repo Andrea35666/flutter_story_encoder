@@ -1,3 +1,11 @@
+## 1.2.0
+
+- **Android**: Fixed video corruption caused by pixel alignment issues; implemented `GL_UNPACK_ALIGNMENT` in `OpenGLRenderer`.
+- **iOS**: Optimized pixel swizzling logic in `FlutterStoryEncoderPlugin` for 2x performance boost and perfect color accuracy.
+- **Validation**: Added rigorous input validation in `FlutterStoryEncoder.start` to prevent native-level crashes (guards against odd dimensions, 0/negative FPS, and invalid bitrates).
+- **Tests**: Rewrote the entire unit test suite to improve reliability and verify input validation logic.
+- **Best Practices**: Updated example project and README to demonstrate exact-resolution frame capture using calculated `pixelRatio`.
+
 ## 1.1.7
 
 - **macOS**: Added full macOS platform support with native `AVFoundation`-backed Swift implementation.

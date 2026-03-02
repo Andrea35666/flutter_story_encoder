@@ -147,16 +147,17 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         let baseAddress = CVPixelBufferGetBaseAddress(buffer)
         
         data.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) in
-            let rawPointer = pointer.baseAddress!.assumingMemoryBound(to: UInt8.self)
-            let bgrPointer = baseAddress!.assumingMemoryBound(to: UInt8.self)
+            guard let rawPointer = pointer.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                  let bgrPointer = baseAddress?.assumingMemoryBound(to: UInt8.self) else { return }
             
-            // Fast swizzle RGBA -> BGRA
-            // B = R[2], G = R[1], R = R[0], A = R[3]
-            for i in stride(from: 0, to: data.count, by: 4) {
-                bgrPointer[i] = rawPointer[i + 2]     // Blue
-                bgrPointer[i + 1] = rawPointer[i + 1] // Green
-                bgrPointer[i + 2] = rawPointer[i]     // Red
-                bgrPointer[i + 3] = rawPointer[i + 3] // Alpha
+            let totalPixels = data.count / 4
+            for j in 0..<totalPixels {
+                let offset = j * 4
+                // RGBA [0,1,2,3] -> BGRA [2,1,0,3]
+                bgrPointer[offset] = rawPointer[offset + 2]     // Blue
+                bgrPointer[offset + 1] = rawPointer[offset + 1] // Green
+                bgrPointer[offset + 2] = rawPointer[offset]     // Red
+                bgrPointer[offset + 3] = rawPointer[offset + 3] // Alpha
             }
         }
         

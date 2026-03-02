@@ -19,11 +19,11 @@ class OpenGLRenderer(
     private var rgbaBuffer: ByteBuffer? = null
     private val rectBuffer: ByteBuffer =
             ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder()).apply {
-                asFloatBuffer().put(floatArrayOf(-1f, -1f, 1f, -1f, -1f, 1f, 1f, 1f)).position(0)
+                asFloatBuffer().put(floatArrayOf(-1f, 1f, -1f, -1f, 1f, 1f, 1f, -1f)).position(0)
             }
     private val texBuffer: ByteBuffer =
             ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder()).apply {
-                asFloatBuffer().put(floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f, 1f, 1f)).position(0)
+                asFloatBuffer().put(floatArrayOf(0f, 0f, 0f, 1f, 1f, 0f, 1f, 1f)).position(0)
             }
 
     init {
@@ -90,7 +90,7 @@ class OpenGLRenderer(
             varying vec2 vTexCoord;
             uniform sampler2D sTexture;
             void main() {
-                gl_FragColor = texture2D(sTexture, vec2(vTexCoord.x, 1.0 - vTexCoord.y));
+                gl_FragColor = texture2D(sTexture, vTexCoord);
             }
         """.trimIndent()
 
@@ -108,6 +108,8 @@ class OpenGLRenderer(
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+        // Ensure 1-byte alignment for RGBA data to avoid stride issues
+        GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT, 1)
     }
 
     fun render(rgbaData: ByteArray, ptsNs: Long) {
@@ -152,6 +154,11 @@ class OpenGLRenderer(
 
         EGLExt.eglPresentationTimeANDROID(eglDisplay, eglSurface, ptsNs)
         EGL14.eglSwapBuffers(eglDisplay, eglSurface)
+
+        val error = GLES20.glGetError()
+        if (error != GLES20.GL_NO_ERROR) {
+            android.util.Log.e("FlutterStoryEncoder", "GL Error: $error")
+        }
     }
 
     private fun loadShader(type: Int, source: String): Int {

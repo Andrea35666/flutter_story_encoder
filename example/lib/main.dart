@@ -57,6 +57,7 @@ class _EncoderExampleState extends State<EncoderExample>
   static const int _totalFrames = 60;
   static const int _width = 1080;
   static const int _height = 1920;
+  static const double _fps = 30.0;
 
   @override
   void initState() {
@@ -93,7 +94,7 @@ class _EncoderExampleState extends State<EncoderExample>
       config: EncoderConfig(
         width: _width,
         height: _height,
-        fps: 30,
+        fps: _fps.toInt(),
         bitrate: 10000000, // 10 Mbps
         outputPath: outputPath,
         addSilentAudio: true,
@@ -129,7 +130,10 @@ class _EncoderExampleState extends State<EncoderExample>
               as RenderRepaintBoundary?;
 
       if (boundary != null) {
-        final ui.Image image = await boundary.toImage(pixelRatio: 1.0);
+        // Best Practice: Capture at exact target dimensions to avoid stride/padding issues.
+        final double pixelRatio = _width / boundary.size.width;
+        final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+
         final ByteData? byteData = await image.toByteData(
           format: ui.ImageByteFormat.rawRgba,
         );
@@ -145,7 +149,7 @@ class _EncoderExampleState extends State<EncoderExample>
           }
         }
       } else {
-        // Fallback: append a blank RGBA frame (no Alpha = fully black).
+        // Fallback: append a blank RGBA frame.
         final frame = Uint8List(_width * _height * 4);
         await FlutterStoryEncoder.appendFrame(frame);
       }
