@@ -24,7 +24,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         instance.flutterApi = StoryEncoderFlutterApi(binaryMessenger: registrar.messenger())
     }
     
-    func start(config: EncoderConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
+    internal func start(config: EncoderConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
         queue.async {
             self._start(config: config, completion: completion)
         }
@@ -102,7 +102,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         }
     }
     
-    func appendFrame(rgbaData: FlutterStandardTypedData, completion: @escaping (Result<Bool, Error>) -> Void) {
+    internal func appendFrame(rgbaData: FlutterStandardTypedData, completion: @escaping (Result<Bool, Error>) -> Void) {
         queue.async {
             guard self.isEncoding, let videoInput = self.videoInput else {
                 completion(.success(false))
@@ -240,7 +240,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         }
     }
     
-    func finish(completion: @escaping (Result<String?, Error>) -> Void) {
+    internal func finish(completion: @escaping (Result<String?, Error>) -> Void) {
         queue.async {
             self.isEncoding = false
             self.videoInput?.markAsFinished()
@@ -255,7 +255,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterPlugin, StoryEncoderHos
         }
     }
     
-    func cancel() throws {
+    internal func cancel() throws {
         queue.async {
             self.isEncoding = false
             self.assetWriter?.cancelWriting()

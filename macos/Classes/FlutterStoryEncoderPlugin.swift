@@ -25,7 +25,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterMacOSPlugin, StoryEncod
         registrar.addMethodCallDelegate(instance, channel: FlutterMethodChannel(name: "flutter_story_encoder_macos", binaryMessenger: registrar.messenger))
     }
     
-    public func start(config: EncoderConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
+    func start(config: EncoderConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
         queue.async {
             self._start(config: config, completion: completion)
         }
@@ -103,7 +103,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterMacOSPlugin, StoryEncod
         }
     }
     
-    public func appendFrame(rgbaData: FlutterStandardTypedData, completion: @escaping (Result<Bool, Error>) -> Void) {
+    func appendFrame(rgbaData: FlutterStandardTypedData, completion: @escaping (Result<Bool, Error>) -> Void) {
         queue.async {
             guard self.isEncoding, let videoInput = self.videoInput else {
                 completion(.success(false))
@@ -235,7 +235,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterMacOSPlugin, StoryEncod
         }
     }
     
-    public func finish(completion: @escaping (Result<String?, Error>) -> Void) {
+    func finish(completion: @escaping (Result<String?, Error>) -> Void) {
         queue.async {
             self.isEncoding = false
             self.videoInput?.markAsFinished()
@@ -250,7 +250,7 @@ public class FlutterStoryEncoderPlugin: NSObject, FlutterMacOSPlugin, StoryEncod
         }
     }
     
-    public func cancel() throws {
+    func cancel() throws {
         queue.async {
             self.isEncoding = false
             self.assetWriter?.cancelWriting()

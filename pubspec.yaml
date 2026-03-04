@@ -1,6 +1,6 @@
 name: flutter_story_encoder
 description: A high-performance, hardware-accelerated video encoding engine for Flutter stories. Supporting 4K and thermal stability.
-version: 1.2.1
+version: 1.2.2
 homepage: https://github.com/lucasveneno/flutter_story_encoder
 repository: https://github.com/lucasveneno/flutter_story_encoder
 issue_tracker: https://github.com/lucasveneno/flutter_story_encoder/issues

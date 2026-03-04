@@ -1,3 +1,7 @@
+## 1.2.2
+
+- **macOS/iOS**: Fixed Xcode compilation error by correcting `public` visibility on internal Pigeon-generated types.
+
 ## 1.2.0
 
 - **Android**: Fixed video corruption caused by pixel alignment issues; implemented `GL_UNPACK_ALIGNMENT` in `OpenGLRenderer`.
